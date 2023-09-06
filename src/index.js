@@ -3,10 +3,12 @@ const morgan = require('morgan')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const TaskRoutes = require('./routes/tasks')
+const cors = require('cors')
 
 require('dotenv').config();
 
 const app = express()
+app.use(cors())
 app.use(express.static("public"));
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));

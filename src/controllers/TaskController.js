@@ -29,7 +29,20 @@ const updatePriority = async (req, res) => {
     }
 }
 
+const FetchAllTasks = async (req, res) => {
+    try {
+        const allTasks = await Task.find()
+       if(!! allTasks){
+        return res.status(200).json({ allTasks: allTasks })
+       }
+       return res.status(200).json({message: 'No Task found'})
+    } catch (error) {
+        return res.status(400).json({ message: error.message })
+    }
+}
+
 module.exports = {
     createTask,
-    updatePriority
+    updatePriority,
+    FetchAllTasks
 }
