@@ -13,6 +13,8 @@ const createTask = async (req, res) => {
 
 const updatePriority = async (req, res) => {
     try {
+        console.log("Got an ID ", req.body?._id);
+        console.log("Got priority  ", req.body?.priority);
         const taskId = req.body?._id;
         const newPriority = req.body?.priority;
         if (!taskId || !newPriority) {
@@ -29,6 +31,25 @@ const updatePriority = async (req, res) => {
     }
 }
 
+const updateStatus = async (req, res) => {
+    try {
+        const taskId = req.body?._id;
+        const newStatus = req.body?.status;
+        if (!taskId || !newStatus) {
+            return res.status(400).json({ message: 'Missing parameter _id or priority' })
+        }
+        const objectIdTaskId = new mongoose.Types.ObjectId(taskId)
+        const updatedTask = await Task.findByIdAndUpdate(objectIdTaskId, { status: newStatus }, { new: true })
+        if (!!updatedTask) {
+            return res.status(200).json({ message: "User updated successfully" })
+        }
+        return res.status(400).json({ message: 'User not found' })
+    } catch (error) {
+        return res.status(400).json({ message: error.message })
+    }
+}
+
+
 const FetchAllTasks = async (req, res) => {
     try {
         const allTasks = await Task.find()
@@ -44,5 +65,6 @@ const FetchAllTasks = async (req, res) => {
 module.exports = {
     createTask,
     updatePriority,
-    FetchAllTasks
+    FetchAllTasks,
+    updateStatus
 }
