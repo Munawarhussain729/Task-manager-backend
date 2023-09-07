@@ -3,7 +3,7 @@ const Schema = mongoose.Schema
 
 const TaskSchema = new Schema({
     assignedTo: {
-        type: Array
+        type: String
     },
     status: {
         type: String,
