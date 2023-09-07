@@ -3,6 +3,7 @@ const morgan = require('morgan')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const TaskRoutes = require('./routes/tasks')
+const UserRoutes = require('./routes/User')
 const cors = require('cors')
 
 require('dotenv').config();
@@ -23,3 +24,4 @@ mongoose.connect(process.env.MONGO_URL).then((result) => {
 }).catch((error) => { console.log(error); })
 
 app.use('/task', TaskRoutes)
+app.use('/user', UserRoutes)
