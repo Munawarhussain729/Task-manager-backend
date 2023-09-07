@@ -23,6 +23,42 @@ const createUser = async (req, res) => {
     }
 }
 
+const getAllUsers = async (req, res) => {
+    try {
+        const allUsers = await User.find()
+        console.log("All users are ", allUsers);
+        if (!!allUsers) {
+            return res.status(200).json({ users: allUsers })
+        }
+        res.status(200).json({ message: "No User found" })
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
+
+const getUser = async (req, res) => {
+    try {
+        const userId = req?.params?.id
+        console.log("user id found ", userId);
+        if (!userId) {
+            return res.status(400).json({ message: "No user found" })
+        }
+        const userObjectId = new mongoose.Types.ObjectId(userId)
+        const user = await User.findById(userObjectId)
+        console.log("User exists ", user);
+        if (!!user) {
+            res.status(200).json({ user: user })
+        }
+        else {
+            res.status(400).json({ message: "User does not exists" })
+        }
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
+
 module.exports = {
-    createUser
+    createUser,
+    getAllUsers,
+    getUser
 }

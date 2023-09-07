@@ -13,8 +13,6 @@ const createTask = async (req, res) => {
 
 const updatePriority = async (req, res) => {
     try {
-        console.log("Got an ID ", req.body?._id);
-        console.log("Got priority  ", req.body?.priority);
         const taskId = req.body?._id;
         const newPriority = req.body?.priority;
         if (!taskId || !newPriority) {
