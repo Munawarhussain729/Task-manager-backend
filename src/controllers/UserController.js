@@ -1,7 +1,9 @@
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
 const User = require('../models/UserModel')
 
 const createUser = async (req, res) => {
+    const saltRound = 10;
     try {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         if (emailPattern.test(req?.body?.email)) {
@@ -10,8 +12,12 @@ const createUser = async (req, res) => {
             if (existingUser) {
                 return res.status(400).json({ message: 'Email is already in use' });
             }
+            const password = req.body?.password
+            const encryptedPass = await bcrypt.hash(password, saltRound)
+            console.log("Encrypted Pass : ", encryptedPass);
+            const userDetail = { ...req.body, password: encryptedPass }
 
-            const newUser = new User(req?.body)
+            const newUser = new User(userDetail)
             await newUser.save()
             res.status(200).json({ message: "User created successfuly" })
         }
@@ -66,17 +72,18 @@ const validateUser = async (req, res) => {
             if (!existingUser) {
                 return res.status(400).json({ message: 'No user found' });
             }
-
-            if (existingUser?.password === req?.body?.password) {
+            const userValid = await bcrypt.compare(req?.body?.password, existingUser?.password )
+            console.log("Password valid ", userValid);
+            if (userValid) {
                 return res.status(200).json({ message: "user validated" })
             }
-            res.status(400).json({ message: "User not validated" })
+            res.status(400).json({ message: "Invalid password" })
         }
         else {
             res.status(400).json({ message: "Invalid Email address" })
         }
     } catch (error) {
-        res.status(400).json({ message: error.message })
+        res.status(400).json({ message: 'Invalid user name or password' })
     }
 }
 module.exports = {
