@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
-const User = require('../models/UserModel')
+const User = require('../models/UserModel');
+const Task = require('../models/TaskModel');
 
 const createUser = async (req, res) => {
     const saltRound = 10;
@@ -14,7 +15,6 @@ const createUser = async (req, res) => {
             }
             const password = req.body?.password
             const encryptedPass = await bcrypt.hash(password, saltRound)
-            console.log("Encrypted Pass : ", encryptedPass);
             const userDetail = { ...req.body, password: encryptedPass }
 
             const newUser = new User(userDetail)
@@ -32,7 +32,6 @@ const createUser = async (req, res) => {
 const getAllUsers = async (req, res) => {
     try {
         const allUsers = await User.find()
-        console.log("All users are ", allUsers);
         if (!!allUsers) {
             return res.status(200).json({ users: allUsers })
         }
@@ -45,13 +44,11 @@ const getAllUsers = async (req, res) => {
 const getUser = async (req, res) => {
     try {
         const userId = req?.params?.id
-        console.log("user id found ", userId);
         if (!userId) {
             return res.status(400).json({ message: "No user found" })
         }
         const userObjectId = new mongoose.Types.ObjectId(userId)
         const user = await User.findById(userObjectId)
-        console.log("User exists ", user);
         if (!!user) {
             res.status(200).json({ user: user })
         }
@@ -73,9 +70,8 @@ const validateUser = async (req, res) => {
                 return res.status(400).json({ message: 'No user found' });
             }
             const userValid = await bcrypt.compare(req?.body?.password, existingUser?.password )
-            console.log("Password valid ", userValid);
             if (userValid) {
-                return res.status(200).json({ message: "user validated" })
+                return res.status(200).json({ userProfile: existingUser })
             }
             res.status(400).json({ message: "Invalid password" })
         }
@@ -86,9 +82,29 @@ const validateUser = async (req, res) => {
         res.status(400).json({ message: 'Invalid user name or password' })
     }
 }
+
+const getMyTask = async (req, res) => {
+    try {
+        const userId = req?.params?.id
+    
+        // const userId = new mongoose.Types.ObjectId(id)
+        // console.log("User id it became ", userId);
+        if(userId){
+            const userTasks = await Task.find({ assignedTo: userId });
+            return res.status(200).json({ userTasks });
+        }
+        else{
+            res.status(400).json({ message: "Usernot found" })
+        }
+
+    } catch (error) {
+        res.status(400).json({ message: 'Error in finding task' })
+    }
+}
 module.exports = {
     createUser,
     getAllUsers,
     getUser,
-    validateUser
+    validateUser,
+    getMyTask
 }

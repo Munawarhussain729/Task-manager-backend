@@ -3,6 +3,9 @@ const Task = require('../models/TaskModel')
 
 const createTask = async (req, res) => {
     try {
+        if (Object.keys(req.body).length === 0) {
+            return res.status(400).json({ message: 'No title found' })
+        }
         const newTask = new Task(req.body)
         const savedTask = await newTask.save()
         res.status(200).json(savedTask)
@@ -21,9 +24,9 @@ const updatePriority = async (req, res) => {
         const objectIdTaskId = new mongoose.Types.ObjectId(taskId)
         const updatedTask = await Task.findByIdAndUpdate(objectIdTaskId, { priority: newPriority }, { new: true })
         if (!!updatedTask) {
-            return res.status(200).json({ message: "User updated successfully" })
+            return res.status(200).json({ updatedTask: updatedTask })
         }
-        return res.status(400).json({ message: 'User not found' })
+        return res.status(400).json({ message: 'Task not found' })
     } catch (error) {
         return res.status(400).json({ message: error.message })
     }
@@ -39,9 +42,9 @@ const updateStatus = async (req, res) => {
         const objectIdTaskId = new mongoose.Types.ObjectId(taskId)
         const updatedTask = await Task.findByIdAndUpdate(objectIdTaskId, { status: newStatus }, { new: true })
         if (!!updatedTask) {
-            return res.status(200).json({ message: "User updated successfully" })
+            return res.status(200).json({ updatedTask: updatedTask  })
         }
-        return res.status(400).json({ message: 'User not found' })
+        return res.status(400).json({ message: 'Task not found' })
     } catch (error) {
         return res.status(400).json({ message: error.message })
     }
@@ -50,20 +53,21 @@ const updateStatus = async (req, res) => {
 const updateTaskDetails = async (req, res) => {
     try {
         const taskId = req.body?._id;
-        const newDetails = req.body?.details;
+        let newDetails = req.body?.details;
         if (!taskId || !newDetails) {
             return res.status(400).json({ message: 'Missing parameter _id or priority' })
         }
-        console.log("Inside the route");
+        // newDetails?.assignTo = new mongoose.Types.ObjectId(newDetails?.assignTo)
+      
         const objectIdTaskId = new mongoose.Types.ObjectId(taskId)
         const updatedTask = await Task.findByIdAndUpdate(objectIdTaskId,
             { $set: newDetails },
             { new: true })
 
         if (!!updatedTask) {
-            return res.status(200).json({ message: "User updated successfully" })
+            return res.status(200).json({ updatedTask: updatedTask })
         }
-        return res.status(400).json({ message: 'User not found' })
+        return res.status(400).json({ message: 'Task not found' })
     } catch (error) {
         return res.status(400).json({ message: error.message })
     }
@@ -75,7 +79,22 @@ const FetchAllTasks = async (req, res) => {
         if (!!allTasks) {
             return res.status(200).json({ allTasks: allTasks })
         }
-        return res.status(200).json({ message: 'No Task found' })
+        return res.status(400).json({ message: 'No Task found' })
+    } catch (error) {
+        return res.status(400).json({ message: error.message })
+    }
+}
+
+const RemoveTask = async (req, res) => {
+    try {
+        const taskId = req?.params?.id
+        const objectTaskId = new mongoose.Types.ObjectId(taskId)
+        const allTasks =  await Task.findOneAndDelete(objectTaskId)
+        if (!!allTasks) {
+            return res.status(200).json({ allTasks: allTasks })
+        }
+        return res.status(400).json({ message: 'No Task found' })
+
     } catch (error) {
         return res.status(400).json({ message: error.message })
     }
@@ -86,5 +105,6 @@ module.exports = {
     updatePriority,
     FetchAllTasks,
     updateStatus,
-    updateTaskDetails
+    updateTaskDetails,
+    RemoveTask
 }
