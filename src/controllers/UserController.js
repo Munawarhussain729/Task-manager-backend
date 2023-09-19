@@ -60,6 +60,44 @@ const getUser = async (req, res) => {
     }
 }
 
+const updateUser = async (req, res) => {
+    try {
+        const userId = req?.body?._id
+        const userDetails = req?.body?.userDetails
+        if (!userId) {
+            return res.status(400).json({ message: "User id not found" })
+        }
+        const userObjectId = new mongoose.Types.ObjectId(userId)
+        const user = await User.findByIdAndUpdate(userObjectId, userDetails, { new: true })
+        if(!!user){
+            res.status(200).json({ user: user })
+        }
+        else{
+            res.status(400).json({ message: "User could not be updated" })
+        }
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
+const validateGoogleUser = async (req, res) => {
+    try {
+
+        const userDetails = req.body
+        const user = await User.find({ email: userDetails.email })
+        if (user.length > 0) {
+            res.status(200).json({ user: user })
+        }
+        else {
+            userDetails.designation = "developer"
+            const newUser = new User(userDetails)
+            await newUser.save()
+            res.status(200).json({ user: newUser })
+
+        }
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
 const validateUser = async (req, res) => {
     try {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -86,9 +124,6 @@ const validateUser = async (req, res) => {
 const getMyTask = async (req, res) => {
     try {
         const userId = req?.params?.id
-    
-        // const userId = new mongoose.Types.ObjectId(id)
-        // console.log("User id it became ", userId);
         if(userId){
             const userTasks = await Task.find({ assignedTo: userId });
             return res.status(200).json({ userTasks });
@@ -106,5 +141,7 @@ module.exports = {
     getAllUsers,
     getUser,
     validateUser,
-    getMyTask
+    getMyTask,
+    validateGoogleUser,
+    updateUser
 }

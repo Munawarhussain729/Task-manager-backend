@@ -12,11 +12,9 @@ const UserSchema = new Schema({
     },
     password: {
         type: String,
-        required: true
     },
     designation: {
-        type: String,
-        required: true
+        type: String
     }
 })
 
