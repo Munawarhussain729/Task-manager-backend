@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const ProjectSchema = new Schema({
-    name:{
+    title:{
         type:String,
         require,
     },
@@ -17,5 +17,5 @@ const ProjectSchema = new Schema({
     }
 })
 
-const Projects = ProjectSchema.model('Projects', ProjectSchema)
+const Projects = mongoose.model('Projects', ProjectSchema)
 module.exports = Projects

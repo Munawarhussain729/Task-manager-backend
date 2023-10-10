@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const TaskRoutes = require('./routes/tasks')
 const UserRoutes = require('./routes/User')
+const ProjectRoutes = require('./routes/projects')
 const cors = require('cors')
 
 require('dotenv').config();
@@ -25,3 +26,4 @@ mongoose.connect(process.env.MONGO_URL).then((result) => {
 
 app.use('/task', TaskRoutes)
 app.use('/user', UserRoutes)
+app.use('/project', ProjectRoutes)
