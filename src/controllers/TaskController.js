@@ -42,7 +42,7 @@ const updateStatus = async (req, res) => {
         const objectIdTaskId = new mongoose.Types.ObjectId(taskId)
         const updatedTask = await Task.findByIdAndUpdate(objectIdTaskId, { status: newStatus }, { new: true })
         if (!!updatedTask) {
-            return res.status(200).json({ updatedTask: updatedTask })
+            return res.status(200).json({ updatedTask: updatedTask  })
         }
         return res.status(400).json({ message: 'Task not found' })
     } catch (error) {
@@ -58,7 +58,7 @@ const updateTaskDetails = async (req, res) => {
             return res.status(400).json({ message: 'Missing parameter _id or priority' })
         }
         // newDetails?.assignTo = new mongoose.Types.ObjectId(newDetails?.assignTo)
-
+      
         const objectIdTaskId = new mongoose.Types.ObjectId(taskId)
         const updatedTask = await Task.findByIdAndUpdate(objectIdTaskId,
             { $set: newDetails },
@@ -73,32 +73,23 @@ const updateTaskDetails = async (req, res) => {
     }
 }
 
-const FetchAllTasks = (req, res) => {
-    const stream = Task.find().stream();
-
-    stream.on('data', (task) => {
-        // Send each task as it's retrieved
-        res.write(JSON.stringify({ task }) + '\n');
-    });
-
-    stream.on('end', () => {
-        // End the response when all data is sent
-        res.end();
-    });
-
-    stream.on('error', (error) => {
-        // Handle errors
-        console.error(error);
-        res.status(500).json({ message: 'An error occurred' });
-    });
-};
-
+const FetchAllTasks = async (req, res) => {
+    try {
+        const allTasks = await Task.find()
+        if (!!allTasks) {
+            return res.status(200).json({ allTasks: allTasks })
+        }
+        return res.status(400).json({ message: 'No Task found' })
+    } catch (error) {
+        return res.status(400).json({ message: error.message })
+    }
+}
 
 const RemoveTask = async (req, res) => {
     try {
         const taskId = req?.params?.id
         const objectTaskId = new mongoose.Types.ObjectId(taskId)
-        const allTasks = await Task.findOneAndDelete(objectTaskId)
+        const allTasks =  await Task.findOneAndDelete(objectTaskId)
         if (!!allTasks) {
             return res.status(200).json({ allTasks: allTasks })
         }
