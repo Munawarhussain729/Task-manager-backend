@@ -18,14 +18,24 @@ const createProject = async (req, res) => {
 
 const getAllProject = async (req, res) => {
     try {
-        const projects = ProjectModel.find()
+        const projects = await ProjectModel.find()
         res.status(200).json({ projects: projects })
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
 }
-
+const getProjectDetails = async (req, res) => {
+    try {
+        const projectTitle = req?.body?.title
+        console.log("Project title is ", projectTitle);
+        const projects = await ProjectModel.find({title:projectTitle})
+        res.status(200).json({ projects: projects })
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
 module.exports = {
     createProject,
-    getAllProject
+    getAllProject,
+    getProjectDetails,
 }
