@@ -29,7 +29,6 @@ const getAllProject = async (req, res) => {
 const getProjectDetails = async (req, res) => {
     try {
         const projectTitle = req?.body?.title
-        console.log("Project title is ", projectTitle);
         const projects = await ProjectModel.find({ title: projectTitle })
         res.status(200).json({ projects: projects })
     } catch (error) {
@@ -39,9 +38,13 @@ const getProjectDetails = async (req, res) => {
 
 const getProjectTasks = async (req, res) => {
     try {
-        const projectId = req?.body?.projectId
+        const Id = req?.params?.id
+        if(!Id){
+            return  res.status(400).json({ message: 'Project ID found' })
+        }
+        const projectId = new mongoose.Types.ObjectId(Id)
         const project = await ProjectModel.findById(projectId)
-        if (!project) {
+        if (!project) { 
             res.status(400).json({ message: 'Project not found' })
         }
         else {
@@ -102,12 +105,17 @@ const addUser = async (req, res) => {
 
 const getProjectUsers = async (req, res) => {
     try {
-        const projectId = req?.body?.projectId
+        const Id = req?.params?.id
+        if(!Id){
+            return  res.status(400).json({ message: 'Project ID found' })
+        }
+        console.log("Inside project users");
+        const projectId = new mongoose.Types.ObjectId(Id)
         const project = await ProjectModel.findById(projectId)
         if (!project) {
             res.status(400).json({ message: 'Project not found' })
         } else {
-            const users = await Users.find({ _id: { $in: project.users } }).exec()
+            const users = await Users.find({ _id: { $in: project.users } })
             res.status(200).json({ users: users })
         }
     } catch (error) {
