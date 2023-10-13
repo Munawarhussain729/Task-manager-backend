@@ -5,6 +5,7 @@ const router = express.Router()
 
 router.post('/add-task', ProjectController.addTask)
 router.post('/add-user', ProjectController.addUser)
+router.post('/remove-task', ProjectController.removeTask)
 router.post('/create', ProjectController.createProject)
 router.get('/projects', ProjectController.getAllProject)
 router.get('/get-project', ProjectController.getProjectDetails)

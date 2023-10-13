@@ -58,7 +58,14 @@ const getProjectTasks = async (req, res) => {
 
 const addTask = async (req, res) => {
     try {
-        const taskId = req?.body?.taskId
+        if (req?.body?.title?.length === 0) {
+            return res.status(400).json({ message: 'No title found' })
+        }
+        const newTask = new Task(req.body)
+        const savedTask = await newTask.save()
+
+
+        const taskId = savedTask?._id
         const projectId = req?.body?.projectId
         const project = await ProjectModel.findById(projectId)
         if (project) {
@@ -81,6 +88,26 @@ const addTask = async (req, res) => {
     }
 }
 
+
+const removeTask = async (req, res) => {
+    try {
+        const taskId = req?.body?.taskId
+        const projectId = req?.body?.projectId
+
+        const objectTaskId = new mongoose.Types.ObjectId(taskId)
+        const allTasks = await Task.findOneAndDelete(objectTaskId)
+        if (!allTasks) {
+            return res.status(400).json({ message: 'No Task found' })
+        }
+        const result = await ProjectModel.updateOne(
+            { _id: projectId },
+            { $pull: { tasks: taskId } }
+        );
+        res.status(200).json({message:"Rmoved"})
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
 const addUser = async (req, res) => {
     try {
         const userId = req?.body?.userId
@@ -129,5 +156,6 @@ module.exports = {
     addTask,
     getProjectTasks,
     getProjectUsers,
-    addUser
+    addUser,
+    removeTask
 }
